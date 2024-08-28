@@ -1,5 +1,5 @@
 #Author: Arda Demir
-#Release Date: 23/07/2024
+#build Date: 23/07/2024
 
 #Modules
 from pytubefix import YouTube
@@ -17,7 +17,7 @@ app.geometry("500x500")
 app.minsize(500, 500)
 app.resizable(1,1)
 app.title("Audiophile V1.0")
-app.iconbitmap(r"C:\Users\ArDe4\PyEnv\main\icon.ico")
+app.iconbitmap(r"icon.ico")
 customtkinter.set_appearance_mode("dark")
 
 #creates frames for each section
@@ -29,7 +29,7 @@ progressFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
 StatusFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
 
 #upload title icon
-icon = customtkinter.CTkImage(dark_image=Image.open(r"C:\Users\ArDe4\PyEnv\main\icon_title.ico"),
+icon = customtkinter.CTkImage(dark_image=Image.open(r"icon_title.ico"),
                                     size=(32, 32))
 
 #title label
@@ -265,7 +265,7 @@ def aboutWindow(event=None):
     about.title("About")
     about.geometry("250x125")
     about.resizable(0,0)
-    about.after(250, lambda: about.iconbitmap(r"C:\Users\ArDe4\PyEnv\main\icon.ico"))
+    about.after(250, lambda: about.iconbitmap(r"icon.ico"))
     aboutLabel = customtkinter.CTkLabel(about,
                                     image=icon,  
                                     text="About Audiophile",
