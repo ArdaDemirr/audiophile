@@ -59,7 +59,7 @@ def change_event():
         mode = "dark"
         changeButton.configure(text="Light")
         
-
+#appearance change button
 changeButton = customtkinter.CTkButton(imageFrame, 
                                     text="Light", 
                                     command=change_event, 
@@ -78,7 +78,7 @@ linkEntry = customtkinter.CTkEntry(linkFrame,
                                     width=480, 
                                     placeholder_text="Link of video or playlist...",
                                     text_color="#ff8503", 
-                                    placeholder_text_color="#ff8503",
+                                    placeholder_text_color="dark gray",
                                     font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
 linkEntry.pack(fill="x", expand= 1, padx= (5,5), pady=(0,5))
@@ -114,26 +114,55 @@ pathButton = customtkinter.CTkButton(pathFrame,
 
 pathButton.grid(row=1, column=1, padx=(5,5), pady=5, sticky="we")
 
-#playlist interval selection
+def autocheck_event():
+    if autoCheckCheckbox.get() == 1:
+        autoCheckCheckbox.configure(text="autocheck", text_color="#ff8503")
+    else:
+        autoCheckCheckbox.configure(text="autocheck?", text_color="dark grey")
+
+#autocheck checkbox
+autoCheck_var = customtkinter.BooleanVar(value=False)
+autoCheckCheckbox = customtkinter.CTkCheckBox(ctrlFrame,
+                                             text="autocheck?",
+                                             variable=autoCheck_var,
+                                             command=autocheck_event,
+                                             checkbox_width=20,
+                                             checkbox_height=20,
+                                             border_width=1,
+                                             corner_radius=0,
+                                             onvalue=True,
+                                             offvalue=False,
+                                             fg_color="#ff8503",
+                                             hover_color="#FFBF00",
+                                             text_color="dark grey",
+                                             font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
+
+autoCheckCheckbox.grid(row=0, column=1, padx=(0,0), pady=5)
+
+#playlist interval selection create selection boxes if switch turned on, hide them when turned off
 def select_event():
     if switch_var.get() == "on":
-        videoNumberStart.configure(state="normal")
-        videoNumberEnd.configure(state="normal")
+        videoNumberStart.grid(row=0, column=3, padx=(0,0), pady=5)
+        videoNumberEnd.grid(row=0, column=4, padx=(0,0), pady=5)
+        selectSwitch.configure(text="interval ", text_color="#ff8503")
+        
     else:
-        videoNumberStart.configure(state="disabled")
-        videoNumberEnd.configure(state="disabled")
+        videoNumberStart.grid_forget()
+        videoNumberEnd.grid_forget()
+        selectSwitch.configure(text="interval? ", text_color="dark grey")
 
 switch_var = customtkinter.StringVar(value="off")
 selectSwitch = customtkinter.CTkSwitch(ctrlFrame,
                                     text="interval? ",
-                                    text_color="#ff8503",
+                                    text_color="dark grey",
                                     command=select_event,
                                     variable=switch_var, onvalue="on", offvalue="off",
                                     width=1,
                                     progress_color="#ff8503",
+                                    button_hover_color="#FFBF00",
                                     font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
-selectSwitch.grid(row=0, column=1, padx=(0,0), pady=5)
+selectSwitch.grid(row=0, column=2, padx=(0,0), pady=5)
 
 videoNumberStart = customtkinter.CTkEntry(ctrlFrame, 
                                     width=50, 
@@ -142,9 +171,6 @@ videoNumberStart = customtkinter.CTkEntry(ctrlFrame,
                                     placeholder_text_color="#ff8503",
                                     font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
-videoNumberStart.configure(state="disabled")
-videoNumberStart.grid(row=0, column=2, padx=(0,0), pady=5)
-
 
 videoNumberEnd = customtkinter.CTkEntry(ctrlFrame, 
                                     width=50, 
@@ -152,9 +178,6 @@ videoNumberEnd = customtkinter.CTkEntry(ctrlFrame,
                                     text_color="#ff8503", 
                                     placeholder_text_color="#ff8503",
                                     font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
-
-videoNumberEnd.configure(state="disabled")
-videoNumberEnd.grid(row=0, column=3, padx=(0,5), pady=5)
 
 
 #file format
@@ -165,13 +188,19 @@ formatSwtch = customtkinter.CTkSegmentedButton(ctrlFrame,
                                                 font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
 formatSwtch.set("Mp3") # default: MP3
-formatSwtch.grid(row=0, column=4, padx=(0,5), pady=5)
+formatSwtch.grid(row=0, column=5, padx=(25,5), pady=5)
 
-# video download function called by its button
+# video download function called by its button (REDESIGN)
 def download_event():
     fPath = pathEntry.get()
     Link = linkEntry.get()
     format = formatSwtch.get()
+    auto_check = autoCheck_var.get()            # Get the state of the auto-check checkbox
+    
+    # Get list of existing files in the target directory with specific formats
+    existing_files_mp4 = {file_name[:-4] for file_name in os.listdir(fPath) if file_name.endswith(".mp4")}
+    existing_files_mp3 = {file_name[:-4] for file_name in os.listdir(fPath) if file_name.endswith(".mp3")}
+    
     if Link[24:32] == "playlist":               #checks url for playlist keyword. If there is, program runs that part
         yt = Playlist(Link)
         if switch_var.get() == "off" or int(videoNumberStart.get()) == int(videoNumberEnd.get()):           #if pl interval switch if off program downloads all videos from pl
@@ -195,6 +224,21 @@ def download_event():
         statusBox.update()
         
         for video in yt.videos[start:end]:          #for MP4 files
+            title = video.title
+            if auto_check:
+                if format == "Mp4" and title in existing_files_mp4:  # Skip MP4 if already exists
+                    statusBox.insert("end", f'\nSkipping: {title} (MP4 already exists)')
+                    statusBox.yview("end")
+                    statusBox.update()
+                    videocount-=1
+                    continue
+                elif format == "Mp3" and title in existing_files_mp3:  # Skip MP3 if already exists
+                    statusBox.insert("end", f'\nSkipping: {title} (MP3 already exists)')
+                    statusBox.yview("end")
+                    statusBox.update()
+                    videocount-=1
+                    continue
+
             if format == "Mp4":
                 statusBox.insert("end",f'\nDownloading: {video.title}')
                 statusBox.yview("end")
@@ -214,9 +258,29 @@ def download_event():
 
     else:                           #if link isn't include playlist keyword program assume its a single video
         yt = YouTube(Link)
+        title = yt.title
         videocount = 1
         statusBox.configure(state="normal")
         statusBox.insert("end",f'\n--------------------------------------------------------------------------------------------------------------------\nDownloading: {yt.title}')
+        statusBox.yview("end")
+        statusBox.update()
+        
+        if auto_check:
+            if format == "Mp4" and title in existing_files_mp4:  # Skip MP4 if already exists
+                statusBox.insert("end", f'\nSkipping: {title} (MP4 already exists)')
+                statusBox.yview("end")
+                statusBox.update()
+                videocount-=1
+                return
+            elif format == "Mp3" and title in existing_files_mp3:  # Skip MP3 if already exists
+                statusBox.insert("end", f'\nSkipping: {title} (MP3 already exists)')
+                statusBox.yview("end")
+                statusBox.update()
+                videocount-=1
+                return
+        
+        statusBox.configure(state="normal")
+        statusBox.insert("end", f'\n--------------------------------------------------------------------------------------------------------------------\nDownloading: {title}')
         statusBox.yview("end")
         statusBox.update()
 
@@ -246,7 +310,7 @@ downloadButton = customtkinter.CTkButton(ctrlFrame,
                                         width=30,
                                         font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
-downloadButton.grid(row=0, column=5, padx=(0,0), pady=5)
+downloadButton.grid(row=0, column=6, padx=(5,0), pady=5)
 
 
 #a status box for show processes 
@@ -329,7 +393,7 @@ progressFrame.grid_columnconfigure(1, weight=0)
 progressFrame.grid_rowconfigure(0, weight=1)
 
 ctrlFrame.grid_columnconfigure(0, weight=1)
-ctrlFrame.grid_columnconfigure(6, weight=1)
+ctrlFrame.grid_columnconfigure(7, weight=1)
 
 imageFrame.pack(fill="x", expand=0)
 linkFrame.pack(fill="x",expand=0)
