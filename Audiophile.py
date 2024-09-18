@@ -1,5 +1,5 @@
 #Author: Arda Demir
-#build Date: 23/07/2024
+#build Date: 18/09/2024
 
 #Modules
 from pytubefix import YouTube
@@ -12,21 +12,24 @@ import os
 
 #create root windows preferences
 #default gray color: #2b2b2b
-app = customtkinter.CTk(fg_color="#2b2b2b")
+app = customtkinter.CTk()
 app.geometry("500x500")
 app.minsize(500, 500)
 app.resizable(1,1)
 app.title("Audiophile V1.0")
 app.iconbitmap(r"icon.ico")
-customtkinter.set_appearance_mode("dark")
+
+mode = "dark"
+customtkinter.set_appearance_mode(mode)
 
 #creates frames for each section
-imageFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
-linkFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
-pathFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
-ctrlFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
-progressFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
-StatusFrame = customtkinter.CTkFrame(master=app, corner_radius=0)
+imageFrame = customtkinter.CTkFrame(master=app, corner_radius=0, border_width=0, fg_color="transparent")
+linkFrame = customtkinter.CTkFrame(master=app, corner_radius=0, border_width=0, fg_color="transparent")
+pathFrame = customtkinter.CTkFrame(master=app, corner_radius=0, border_width=0, fg_color="transparent")
+ctrlFrame = customtkinter.CTkFrame(master=app, corner_radius=0, border_width=0, fg_color="transparent")
+progressFrame = customtkinter.CTkFrame(master=app, corner_radius=0, border_width=0, fg_color="transparent")
+StatusFrame = customtkinter.CTkFrame(master=app, corner_radius=0, border_width=0, fg_color="transparent")
+
 
 #upload title icon
 icon = customtkinter.CTkImage(dark_image=Image.open(r"icon_title.ico"),
@@ -42,7 +45,33 @@ icon_label = customtkinter.CTkLabel(imageFrame,
                                     padx = 10,
                                     font=customtkinter.CTkFont(family="Bauhaus 93", size=18))
 
-icon_label.pack(fill="x", padx= (10,10), pady=(10,10))
+icon_label.grid(row=0, column=0, padx=(75,5), pady=5, sticky="we")
+
+#change appearance mode
+def change_event():
+    global mode
+    if mode == "dark":
+        customtkinter.set_appearance_mode("light")
+        mode = "light"
+        changeButton.configure(text="Dark")
+    else:
+        customtkinter.set_appearance_mode("dark")
+        mode = "dark"
+        changeButton.configure(text="Light")
+        
+
+changeButton = customtkinter.CTkButton(imageFrame, 
+                                    text="Light", 
+                                    command=change_event, 
+                                    border_color="#000000",
+                                    fg_color="#ff8503",  
+                                    hover_color="#FFBF00", 
+                                    corner_radius=10,
+                                    width=15, 
+                                    height=15,
+                                    font=customtkinter.CTkFont(family="garamond", size=10, weight="bold"))
+
+changeButton.grid(row=0, column=1, padx=(5,5), pady=5, sticky="e")
 
 #entry field for youtube video/playlist URL
 linkEntry = customtkinter.CTkEntry(linkFrame, 
@@ -101,11 +130,10 @@ selectSwitch = customtkinter.CTkSwitch(ctrlFrame,
                                     command=select_event,
                                     variable=switch_var, onvalue="on", offvalue="off",
                                     width=1,
-                                    bg_color="#2b2b2b",
                                     progress_color="#ff8503",
                                     font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
-selectSwitch.grid(row=0, column=0, padx=(0,0), pady=5)
+selectSwitch.grid(row=0, column=1, padx=(0,0), pady=5)
 
 videoNumberStart = customtkinter.CTkEntry(ctrlFrame, 
                                     width=50, 
@@ -115,7 +143,7 @@ videoNumberStart = customtkinter.CTkEntry(ctrlFrame,
                                     font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
 videoNumberStart.configure(state="disabled")
-videoNumberStart.grid(row=0, column=1, padx=(0,0), pady=5)
+videoNumberStart.grid(row=0, column=2, padx=(0,0), pady=5)
 
 
 videoNumberEnd = customtkinter.CTkEntry(ctrlFrame, 
@@ -126,7 +154,7 @@ videoNumberEnd = customtkinter.CTkEntry(ctrlFrame,
                                     font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
 videoNumberEnd.configure(state="disabled")
-videoNumberEnd.grid(row=0, column=2, padx=(0,0), pady=5)
+videoNumberEnd.grid(row=0, column=3, padx=(0,5), pady=5)
 
 
 #file format
@@ -137,8 +165,7 @@ formatSwtch = customtkinter.CTkSegmentedButton(ctrlFrame,
                                                 font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
 formatSwtch.set("Mp3") # default: MP3
-formatSwtch.grid(row=0, column=3, padx=(15,15), pady=5)
-
+formatSwtch.grid(row=0, column=4, padx=(0,5), pady=5)
 
 # video download function called by its button
 def download_event():
@@ -219,7 +246,7 @@ downloadButton = customtkinter.CTkButton(ctrlFrame,
                                         width=30,
                                         font=customtkinter.CTkFont(family="garamond", size=13, weight="bold"))
 
-downloadButton.grid(row=0, column=4, padx=(0,0), pady=5)
+downloadButton.grid(row=0, column=5, padx=(0,0), pady=5)
 
 
 #a status box for show processes 
@@ -289,6 +316,10 @@ def aboutWindow(event=None):
 app.bind('<Control-F1>', aboutWindow)
 
 #layout things
+imageFrame.grid_columnconfigure(0, weight=1)
+imageFrame.grid_columnconfigure(1, weight=0)
+imageFrame.grid_rowconfigure(0, weight=1)
+
 pathFrame.grid_columnconfigure(0, weight=1)
 pathFrame.grid_columnconfigure(1, weight=0)
 pathFrame.grid_rowconfigure(0, weight=1)
@@ -297,10 +328,13 @@ progressFrame.grid_columnconfigure(0, weight=1)
 progressFrame.grid_columnconfigure(1, weight=0)
 progressFrame.grid_rowconfigure(0, weight=1)
 
+ctrlFrame.grid_columnconfigure(0, weight=1)
+ctrlFrame.grid_columnconfigure(6, weight=1)
+
 imageFrame.pack(fill="x", expand=0)
 linkFrame.pack(fill="x",expand=0)
 pathFrame.pack(fill="x",expand=0)
-ctrlFrame.pack(expand=0)
+ctrlFrame.pack(fill="x", expand=0)
 progressFrame.pack(fill="x", expand=0)
 StatusFrame.pack(fill="both", expand=1)
 
