@@ -278,11 +278,6 @@ def download_event():
                 statusBox.update()
                 videocount-=1
                 return
-        
-        statusBox.configure(state="normal")
-        statusBox.insert("end", f'\n--------------------------------------------------------------------------------------------------------------------\nDownloading: {title}')
-        statusBox.yview("end")
-        statusBox.update()
 
         if format == "Mp4":
             video = yt.streams.get_highest_resolution()
