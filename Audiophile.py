@@ -1,5 +1,5 @@
 #Author: Arda Demir
-#build Date: 18/09/2024
+#build Date: 22/12/2024
 
 #Modules
 from pytubefix import YouTube
@@ -9,15 +9,25 @@ from customtkinter import CTkToplevel
 from PIL import Image
 from tkinter import filedialog
 import os
+import sys
+
+#take relative resources paths
+def resource_path(relative_path):
+    try:
+        base_path= sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 #create root windows preferences
 #default gray color: #2b2b2b
 app = customtkinter.CTk()
+iconPath = resource_path('icon.ico')
+app.iconbitmap(iconPath)
 app.geometry("500x500")
 app.minsize(500, 500)
 app.resizable(1,1)
 app.title("Audiophile V1.0")
-app.iconbitmap(r"icon.ico")
 
 mode = "dark"
 customtkinter.set_appearance_mode(mode)
@@ -32,7 +42,8 @@ StatusFrame = customtkinter.CTkFrame(master=app, corner_radius=0, border_width=0
 
 
 #upload title icon
-icon = customtkinter.CTkImage(dark_image=Image.open(r"icon_title.ico"),
+iconPathTitle = resource_path('icon_title.ico')
+icon = customtkinter.CTkImage(dark_image=Image.open(iconPathTitle),
                                     size=(32, 32))
 
 #title label
@@ -351,7 +362,7 @@ def aboutWindow(event=None):
     about.title("About")
     about.geometry("250x125")
     about.resizable(0,0)
-    about.after(250, lambda: about.iconbitmap(r"icon.ico"))
+    about.after(250, lambda: about.iconbitmap(iconPath))
     aboutLabel = customtkinter.CTkLabel(about,
                                     image=icon,  
                                     text="About Audiophile",
