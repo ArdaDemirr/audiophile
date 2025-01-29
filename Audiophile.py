@@ -213,7 +213,7 @@ def download_event():
     existing_files_mp3 = {file_name[:-4] for file_name in os.listdir(fPath) if file_name.endswith(".mp3")}
     
     if Link[24:32] == "playlist":               #checks url for playlist keyword. If there is, program runs that part
-        yt = Playlist(Link)
+        yt = Playlist(Link, 'WEB')
         if switch_var.get() == "off" or int(videoNumberStart.get()) == int(videoNumberEnd.get()):           #if pl interval switch if off program downloads all videos from pl
             start = 0
             end = len(yt.videos)
@@ -268,7 +268,7 @@ def download_event():
                 progressbar.set(value)
 
     else:                           #if link isn't include playlist keyword program assume its a single video
-        yt = YouTube(Link)
+        yt = YouTube(Link, 'WEB')
         title = yt.title
         videocount = 1
         statusBox.configure(state="normal")
